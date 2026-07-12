@@ -6,6 +6,8 @@ Required:
     - full_snapshot_query
     - name
     - password
+    - password_key_vault_id (alternative to password - read from Key Vault instead)
+    - password_key_vault_secret_name (alternative to password - read from Key Vault instead)
     - refresh_type
     - resource_group_name
     - server
@@ -18,18 +20,20 @@ Optional:
 EOT
 
   type = map(object({
-    database                  = string
-    full_snapshot_query       = string
-    name                      = string
-    password                  = string
-    refresh_type              = string
-    resource_group_name       = string
-    server                    = string
-    stream_analytics_job_name = string
-    username                  = string
-    delta_snapshot_query      = optional(string)
-    refresh_interval_duration = optional(string)
-    table                     = optional(string)
+    database                       = string
+    full_snapshot_query            = string
+    name                           = string
+    password                       = string
+    password_key_vault_id          = optional(string)
+    password_key_vault_secret_name = optional(string)
+    refresh_type                   = string
+    resource_group_name            = string
+    server                         = string
+    stream_analytics_job_name      = string
+    username                       = string
+    delta_snapshot_query           = optional(string)
+    refresh_interval_duration      = optional(string)
+    table                          = optional(string)
   }))
   validation {
     condition = alltrue([
