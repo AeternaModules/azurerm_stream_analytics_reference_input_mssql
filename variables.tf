@@ -35,61 +35,118 @@ EOT
     refresh_interval_duration      = optional(string)
     table                          = optional(string)
   }))
-  # --- Unconfirmed validation candidates, derived from azurerm_stream_analytics_reference_input_mssql's provider source ---
-  # Not auto-enabled: either a bespoke provider validator we can't safely translate,
-  # or a path that crosses a list-typed block (needs its own for_each wrapping).
-  # Review, translate into a real validation{} block above, and delete once confirmed.
-  # path: name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: stream_analytics_job_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: resource_group_name
-  #   condition: length(value) <= 90
-  #   message:   [from resourcegroups.ValidateName: invalid when len(value) > 90]
-  #   source:    [from resourcegroups.ValidateName: invalid when len(value) > 90]
-  # path: resource_group_name
-  #   condition: !endswith(value, ".")
-  #   message:   [from resourcegroups.ValidateName: must not end with "."]
-  #   source:    [from resourcegroups.ValidateName: must not end with "."]
-  # path: resource_group_name
-  #   condition: length(value) != 0
-  #   message:   [from resourcegroups.ValidateName: invalid when len(value) == 0]
-  #   source:    [from resourcegroups.ValidateName: invalid when len(value) == 0]
-  # path: resource_group_name
-  #   source:    [from resourcegroups.ValidateName] !matched
-  # path: server
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: database
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: username
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: password
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: refresh_type
-  #   condition: contains(["Static", "RefreshPeriodicallyWithFull", "RefreshPeriodicallyWithDelta"], value)
-  #   message:   must be one of: Static, RefreshPeriodicallyWithFull, RefreshPeriodicallyWithDelta
-  # path: refresh_interval_duration
-  #   source:    [from validate.BatchMaxWaitTime] !ok
-  # path: refresh_interval_duration
-  #   condition: length(value) > 0
-  #   message:   [from validate.BatchMaxWaitTime: invalid when value == ""]
-  #   source:    [from validate.BatchMaxWaitTime: invalid when value == ""]
-  # path: refresh_interval_duration
-  #   source:    [from validate.BatchMaxWaitTime] !matched
-  # path: full_snapshot_query
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: delta_snapshot_query
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: table
-  #   condition: length(value) > 0
-  #   message:   must not be empty
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        length(v.name) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        length(v.stream_analytics_job_name) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        length(v.resource_group_name) <= 90
+      )
+    ])
+    error_message = "[from resourcegroups.ValidateName: invalid when len(value) > 90]"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        !endswith(v.resource_group_name, ".")
+      )
+    ])
+    error_message = "[from resourcegroups.ValidateName: must not end with \".\"]"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        length(v.resource_group_name) != 0
+      )
+    ])
+    error_message = "[from resourcegroups.ValidateName: invalid when len(value) == 0]"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        length(v.server) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        length(v.database) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        length(v.username) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        length(v.password) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        contains(["Static", "RefreshPeriodicallyWithFull", "RefreshPeriodicallyWithDelta"], v.refresh_type)
+      )
+    ])
+    error_message = "must be one of: Static, RefreshPeriodicallyWithFull, RefreshPeriodicallyWithDelta"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        v.refresh_interval_duration == null || (length(v.refresh_interval_duration) > 0)
+      )
+    ])
+    error_message = "[from validate.BatchMaxWaitTime: invalid when value == \"\"]"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        length(v.full_snapshot_query) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        v.delta_snapshot_query == null || (length(v.delta_snapshot_query) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.stream_analytics_reference_input_mssqls : (
+        v.table == null || (length(v.table) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  # Note: 3 additional provider-side validators are enforced at apply time but not mirrored as validation{} blocks here (bespoke or non-mechanically-translatable).
 }
 
